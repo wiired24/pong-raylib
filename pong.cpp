@@ -1,19 +1,20 @@
 #include <iostream>
 #include <raylib.h>
+#include <string>
 
 using namespace std;
 
 // Global Vars
-    int playerScore;
-    int cpuScore;
+int playerScore;
+int cpuScore;
 
 class Ball {
-    public:
-    float x, y; 
+public:
+    float x, y;
     int speed_x, speed_y;
     int radius;
     Sound ball_bounce;
-    
+
     // Constructor for Ball Class (Needed for loading sound)
     Ball() {
         ball_bounce = LoadSound("ping_pong_8bit_beeep.ogg");
@@ -25,7 +26,7 @@ class Ball {
     }
 
     void Draw() {
-          // Draw the ball on to the game screen
+        // Draw the ball on to the game screen
         DrawCircle(x, y, radius, RED);
     }
 
@@ -58,11 +59,11 @@ class Ball {
         // ===============================================================================================================
         // Essentailly this if condition the ball is touching the bottom then bounce. If the ball is touching the top then bounce.
 
-        if(y + radius >= GetScreenHeight() || y - radius <= 0) {
+        if (y + radius >= GetScreenHeight() || y - radius <= 0) {
             speed_y *= -1;
             PlaySound(ball_bounce);
-            
-            
+
+
         }
 
         // Everything is the same here as the Y logic except this is on the X axis so this applies to left to right instead of up/down. 
@@ -84,13 +85,13 @@ class Ball {
                 playerScore++;
             }
 
-            
+
         }
     }
 };
 
 class Paddle {
-    public:
+public:
     float x, y;
     int speed;
     float width, height;
@@ -99,26 +100,36 @@ class Paddle {
     void Draw() {
         DrawRectangle(x, y, width, height, BLUE);
     }
-    
+
     // Check if the Up key is pressed if it is AND if the y position of the paddle is greater than 0 (Meaning it's not already at the top of the screen)
     // Then we move the paddle up by applying y -1 * speed. Remember we decrease going up so it's go -1 -1 -1 -1 as it's moving up by the speed. 
     void Update() {
         if (IsKeyDown(KEY_UP) && y > 0) {
-            y = y -1 * speed;
+            y = y - 1 * speed;
         }
-    
-    // Check if the Down key is being pressed AND if the y position of the paddle is less than the screen height - paddle height. We subtract paddle height because
-    // oddly enough the paddle orgin is at the top so if we want to check the bottom of the paddle to see if it's hit bottom we need to subtract it's height. If both
-    // of these conditions hold true we know we've hit bottom so we can increase y + 1. This will move the paddle upwards by the speed.
+
+        // Same exact logic just checking for Gamepad input here instead of keyboard input
+        if (IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP) && y > 0) {
+            y = y - 1 * speed;
+        }
+
+        // Check if the Down key is being pressed AND if the y position of the paddle is less than the screen height - paddle height. We subtract paddle height because
+        // oddly enough the paddle orgin is at the top so if we want to check the bottom of the paddle to see if it's hit bottom we need to subtract it's height. If both
+        // of these conditions hold true we know we've hit bottom so we can increase y + 1. This will move the paddle upwards by the speed.
         if (IsKeyDown(KEY_DOWN) && y < GetScreenHeight() - height) {
-            y = y +1 * speed;
+            y = y + 1 * speed;
+        }
+
+        // Same exact logic just checking for Gamepad input here instead of keyboard input
+        if (IsGamepadButtonDown(0,GAMEPAD_BUTTON_LEFT_FACE_DOWN) && y < GetScreenHeight() - height) {
+            y = y + 1 * speed;
         }
 
     }
 };
 
 class Paddle2 {
-    public:
+public:
     float x, y;
     int speed;
     float width, height;
@@ -134,26 +145,25 @@ class Paddle2 {
     // therefore we need to move the paddle up by decreasing the Y position of the paddle. Remember in Game Programming y decreasing means up. So if an object
     // has a Y Position less than another object you can safely bet the object with the lower number Y Position is above other object. 
     void Update(int ball_y) {
-        if (y + height/2 > ball_y) {
-            y = y -1 * 5;
+        if (y + height / 2 > ball_y) {
+            y = y - 1 * 5;
         }
 
-    // Here we just do the oppsoite. We again look to see if the center of the paddle y position is less than the balls y position. In the case where the center of the paddle
-    // y position is a lower value than the balls y position, we know that we increase as we move down, therefore the ball is below the paddle so we need to move the paddle down
-    // by decreasing y. So we add +1 to y times the speed.
-        if (y + height/2 <= ball_y) {
-            y = y +1 * 5;
+        // Here we just do the oppsoite. We again look to see if the center of the paddle y position is less than the balls y position. In the case where the center of the paddle
+        // y position is a lower value than the balls y position, we know that we increase as we move down, therefore the ball is below the paddle so we need to move the paddle down
+        // by decreasing y. So we add +1 to y times the speed.
+        if (y + height / 2 <= ball_y) {
+            y = y + 1 * 5;
         }
-    } 
+    }
 };
 
 
 
 
-int main() 
+int main()
 {
     // Initialize the Game Window
-    cout << "Starting the game" << endl;
     const int screenWidth = 1280;
     const int screenHeight = 720;
     const int line_X_Begin = 640;
@@ -162,33 +172,38 @@ int main()
     const int line_y_End = 720;
     string lastHitBall;
     InitWindow(screenWidth, screenHeight, "Pong");
+    ToggleFullscreen();
     InitAudioDevice();
     SetTargetFPS(60);
 
     Ball ball;
     Paddle paddle;
     Paddle2 paddle2;
-    
+
     ball.radius = 20;
     ball.x = screenWidth / 2;
     ball.y = screenHeight / 2;
-    ball.speed_x = 8;
-    ball.speed_y = 8;
-    
+    ball.speed_x = 7;
+    ball.speed_y = 7;
+
     paddle.height = 120;
     paddle.width = 25;
-    paddle.x = 10;
+    paddle.x = 5;
     paddle.y = screenHeight / 2 - 60;
     paddle.speed = 10;
 
     paddle2.width = 25;
     paddle2.height = 120;
-    paddle2.x = 1240;
+    paddle2.x = 1245;
     paddle2.y = screenHeight / 2 - 60;
     paddle2.speed = 10;
 
     // Run the Game loop as long as the windows hasn't been closed
-    while(WindowShouldClose() == false) {
+    // If either ESC on the keyboard or L1 on the Gamepad is hit the game will close
+    while (WindowShouldClose() == false) {
+        if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_TRIGGER_1))
+            break;
+
         BeginDrawing();
 
         // Update the position of the ball
@@ -199,14 +214,14 @@ int main()
         paddle2.Update(ball.y);
 
         // Check for collisions on ball hitting player paddle
-        if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{paddle.x, paddle.y, paddle.width, paddle.height})) 
+        if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ paddle.x, paddle.y, paddle.width, paddle.height }))
         {
             ball.speed_x *= -1;
-            
+
         }
 
         // Check for collisons on ball hitting cpu paddle
-         if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{paddle2.x, paddle2.y, paddle2.width, paddle2.height})) 
+        if (CheckCollisionCircleRec(Vector2{ ball.x, ball.y }, ball.radius, Rectangle{ paddle2.x, paddle2.y, paddle2.width, paddle2.height }))
         {
             ball.speed_x *= -1;
 
@@ -242,6 +257,6 @@ int main()
     }
 
     CloseWindow();
-    
+
     return 0;
 }
