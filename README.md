@@ -1,6 +1,7 @@
 # pong-raylib
 A Pong Clone made with Raylib written in C++. You can either play Solo (Against the Computer AI) or against another player locally. Have fun!
 <br>
+<br>
 Side note: If you're a developer looking to get into making games with Raylib I have put extra effort into making sure the game code is commented
 well and things are explained in detail so you should be able to learn a bit just from reading the code and resulting documentation. 
 
