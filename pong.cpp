@@ -6,6 +6,7 @@ using namespace std;
 
 // Global Vars
 int playerScore;
+int player2Score;
 int cpuScore;
 
 class Ball {
@@ -74,8 +75,12 @@ public:
             // If the x position of the ball is 0 or less we know
             // the ball has reached the edge of the left side of
             // the screen, therefore CPU has scored.
-            if (x - radius <= 0) {
+            if (x - radius <= 0 && !IsGamepadAvailable(1)) {
                 cpuScore++;
+            }
+
+            if (x - radius <= 0 && IsGamepadAvailable(1)) {
+                player2Score++;
             }
 
             // If the x position of the ball + the radius is greater than or equal to 1280 we know the ball has landed
@@ -139,20 +144,37 @@ public:
         DrawRectangle(x, y, width, height, BLUE);
     }
 
-    // This is the AI Code for the game. Basically this looks at the Y Position of the paddle + Height of the paddle 
-    // we divide by 2 to get the center of the paddle. We then compare the center of the paddle position to the current
-    // y position of the ball. If it turns out that the ball has a y position less than the paddle we know the ball is currently above the paddle
-    // therefore we need to move the paddle up by decreasing the Y position of the paddle. Remember in Game Programming y decreasing means up. So if an object
-    // has a Y Position less than another object you can safely bet the object with the lower number Y Position is above other object. 
+
     void Update(int ball_y) {
-        if (y + height / 2 > ball_y) {
+
+        // If a 2nd Gamepad is connected the paddle will be controlled by a second player rather than AI
+        // We check for 1 because if two gamepads are connected, Player 1 = 0, and Player 2 = 1. 
+        if (IsGamepadAvailable(1)) {
+            
+            if (IsGamepadButtonDown(1, GAMEPAD_BUTTON_LEFT_FACE_UP) && y > 0) {
+                y = y - 1 * speed;
+            }
+
+            if (IsGamepadButtonDown(1, GAMEPAD_BUTTON_LEFT_FACE_DOWN) && y < GetScreenHeight() - height) {
+                y = y + 1 * speed;
+            }
+        
+        }
+
+
+        // This is the AI Code for the game. Basically this looks at the Y Position of the paddle + Height of the paddle 
+        // we divide by 2 to get the center of the paddle. We then compare the center of the paddle position to the current
+        // y position of the ball. If it turns out that the ball has a y position less than the paddle we know the ball is currently above the paddle
+        // therefore we need to move the paddle up by decreasing the Y position of the paddle. Remember in Game Programming y decreasing means up. So if an object
+        // has a Y Position less than another object you can safely bet the object with the lower number Y Position is above other object. 
+        if (y + height / 2 > ball_y && !IsGamepadAvailable(1)) {
             y = y - 1 * 5;
         }
 
         // Here we just do the oppsoite. We again look to see if the center of the paddle y position is less than the balls y position. In the case where the center of the paddle
         // y position is a lower value than the balls y position, we know that we increase as we move down, therefore the ball is below the paddle so we need to move the paddle down
-        // by decreasing y. So we add +1 to y times the speed.
-        if (y + height / 2 <= ball_y) {
+        // by decreasing y. So we add +1 to y times the speed. 
+        if (y + height / 2 <= ball_y && !IsGamepadAvailable(1)) {
             y = y + 1 * 5;
         }
     }
@@ -249,9 +271,16 @@ int main()
         DrawText(scoreTextPlayer.c_str(), 200, 0, 25, WHITE);
 
         // Draw CPU Score to the screen
-        std::string scoreTextCpu = "Cpu Score: " + std::to_string(cpuScore);
-        DrawText(scoreTextCpu.c_str(), 800, 0, 25, WHITE);
+        if (!IsGamepadAvailable(1)) {
+            std::string scoreTextCpu = "Cpu Score: " + std::to_string(cpuScore);
+            DrawText(scoreTextCpu.c_str(), 800, 0, 25, WHITE);
+        }
 
+        if (IsGamepadAvailable(1)) {
+            // Draw Player 2 Score to the screen
+            std::string scoreTextCpu = "Player 2 Score: " + std::to_string(player2Score);
+            DrawText(scoreTextCpu.c_str(), 800, 0, 25, WHITE);
+        }
 
         EndDrawing();
     }
