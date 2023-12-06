@@ -8,6 +8,7 @@ using namespace std;
 int playerScore;
 int player2Score;
 int cpuScore;
+Music backgroundMusic;
 
 class Ball {
 public:
@@ -15,15 +16,18 @@ public:
     int speed_x, speed_y;
     int radius;
     Sound ball_bounce;
+    Sound background_music;
 
     // Constructor for Ball Class (Needed for loading sound)
     Ball() {
         ball_bounce = LoadSound("ping_pong_8bit_beeep.ogg");
+        
     }
 
     // Destructor (Needed for unloading sound)
     ~Ball() {
         UnloadSound(ball_bounce);
+        
     }
 
     void Draw() {
@@ -196,6 +200,8 @@ int main()
     InitWindow(screenWidth, screenHeight, "Pong");
     ToggleFullscreen();
     InitAudioDevice();
+    backgroundMusic = LoadMusicStream("Eye_of_the_Storm.mp3");
+    PlayMusicStream(backgroundMusic);
     SetTargetFPS(60);
 
     Ball ball;
@@ -208,14 +214,14 @@ int main()
     ball.speed_x = 7;
     ball.speed_y = 7;
 
-    paddle.height = 120;
+    paddle.height = 150;
     paddle.width = 25;
     paddle.x = 5;
     paddle.y = screenHeight / 2 - 60;
     paddle.speed = 10;
 
     paddle2.width = 25;
-    paddle2.height = 120;
+    paddle2.height = 150;
     paddle2.x = 1245;
     paddle2.y = screenHeight / 2 - 60;
     paddle2.speed = 10;
@@ -225,7 +231,8 @@ int main()
     while (WindowShouldClose() == false) {
         if (IsGamepadButtonPressed(0, GAMEPAD_BUTTON_LEFT_TRIGGER_1))
             break;
-
+        
+        UpdateMusicStream(backgroundMusic);
         BeginDrawing();
 
         // Update the position of the ball
@@ -284,7 +291,8 @@ int main()
 
         EndDrawing();
     }
-
+    UnloadMusicStream(backgroundMusic);
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;
