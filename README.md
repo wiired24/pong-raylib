@@ -14,6 +14,7 @@ Features Implemented
 [x] Background Music that loops
 <br>
 To Do
+<br>
 [] Improve Collisions so that ball cannot get stuck behind paddle
 <br>
 [] Add a Game Over Screen after a player reaches x amount of points
