@@ -16,7 +16,6 @@ public:
     int speed_x, speed_y;
     int radius;
     Sound ball_bounce;
-    Sound background_music;
 
     // Constructor for Ball Class (Needed for loading sound)
     Ball() {
