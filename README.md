@@ -19,6 +19,8 @@ Features Implemented
 <br>
 [x] Background Music that loops
 <br>
+[x] FPS Counter
+<br>
 <br>
 To Do
 <br>
